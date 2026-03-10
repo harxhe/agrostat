@@ -1,0 +1,406 @@
+/* ==========================================================================
+   PredictionForm — CSS Module
+   Scientific form panel with custom dropdown and inline input groups
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Form Container
+   --------------------------------------------------------------------------- */
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-5);
+}
+
+/* ---------------------------------------------------------------------------
+   Section Header
+   --------------------------------------------------------------------------- */
+
+.sectionHeader {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-3);
+}
+
+.sectionIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: var(--radius-md);
+	background: var(--primary-50);
+	color: var(--primary-600);
+	flex-shrink: 0;
+	border: 1px solid var(--primary-100);
+}
+
+.sectionTitle {
+	font-size: var(--text-md);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-text);
+	letter-spacing: var(--tracking-tight);
+	line-height: var(--leading-tight);
+	margin: 0;
+}
+
+.sectionDesc {
+	font-size: var(--text-sm);
+	color: var(--color-text-tertiary);
+	margin-top: 2px;
+	line-height: var(--leading-normal);
+}
+
+/* ---------------------------------------------------------------------------
+   Fields
+   --------------------------------------------------------------------------- */
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	flex: 1;
+	min-width: 0;
+}
+
+.label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1-5);
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--color-text-secondary);
+	letter-spacing: var(--tracking-wider);
+	text-transform: uppercase;
+	margin-bottom: var(--space-2);
+	user-select: none;
+}
+
+.label svg {
+	color: var(--color-text-tertiary);
+	flex-shrink: 0;
+}
+
+.fieldRow {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-4);
+}
+
+@media (max-width: 480px) {
+	.fieldRow {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Custom State Selector / Dropdown
+   --------------------------------------------------------------------------- */
+
+.stateSelector {
+	position: relative;
+}
+
+.stateTrigger {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: var(--space-2-5) var(--space-3);
+	font-size: var(--text-base);
+	font-weight: var(--font-weight-normal);
+	font-family: var(--font-sans);
+	line-height: var(--leading-normal);
+	color: var(--color-text);
+	background-color: var(--color-surface);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	text-align: left;
+	transition:
+		border-color var(--duration-fast) var(--ease-out),
+		box-shadow var(--duration-fast) var(--ease-out),
+		background-color var(--duration-fast) var(--ease-out);
+}
+
+.stateTrigger:hover {
+	border-color: var(--color-border-strong);
+	background-color: var(--gray-25);
+}
+
+.stateTrigger:focus,
+.stateTrigger:focus-visible {
+	outline: none;
+	border-color: var(--primary-300);
+	box-shadow: var(--shadow-ring);
+}
+
+.stateTrigger:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	background-color: var(--color-bg-subtle);
+}
+
+.placeholder {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	color: var(--color-text-quaternary);
+}
+
+.selectedValue {
+	color: var(--color-text);
+	font-weight: var(--font-weight-medium);
+}
+
+.chevron {
+	color: var(--color-text-quaternary);
+	flex-shrink: 0;
+	transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.chevronOpen {
+	transform: rotate(180deg);
+}
+
+/* Dropdown Panel */
+
+.dropdown {
+	position: absolute;
+	top: calc(100% + var(--space-1));
+	left: 0;
+	right: 0;
+	z-index: var(--z-dropdown);
+	background: var(--color-surface);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-lg);
+	overflow: hidden;
+	animation: dropdownFadeIn var(--duration-fast) var(--ease-out) both;
+}
+
+@keyframes dropdownFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.dropdownSearch {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	padding: var(--space-2-5) var(--space-3);
+	border-bottom: var(--border-width) solid var(--color-border-subtle);
+	color: var(--color-text-tertiary);
+}
+
+.dropdownSearch svg {
+	flex-shrink: 0;
+}
+
+.dropdownSearch input {
+	border: none;
+	outline: none;
+	background: transparent;
+	font-size: var(--text-sm);
+	font-family: var(--font-sans);
+	color: var(--color-text);
+	width: 100%;
+	padding: 0;
+}
+
+.dropdownSearch input::placeholder {
+	color: var(--color-text-quaternary);
+}
+
+.dropdownSearch input:focus {
+	box-shadow: none;
+}
+
+.dropdownList {
+	max-height: 240px;
+	overflow-y: auto;
+	padding: var(--space-1);
+}
+
+.dropdownItem {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	width: 100%;
+	padding: var(--space-2) var(--space-2-5);
+	font-size: var(--text-sm);
+	font-family: var(--font-sans);
+	font-weight: var(--font-weight-normal);
+	color: var(--color-text-secondary);
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	text-align: left;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		color var(--duration-fast) var(--ease-out);
+}
+
+.dropdownItem svg {
+	color: var(--color-text-quaternary);
+	flex-shrink: 0;
+}
+
+.dropdownItem:hover {
+	background-color: var(--color-bg-subtle);
+	color: var(--color-text);
+}
+
+.dropdownItem:hover svg {
+	color: var(--primary-500);
+}
+
+.dropdownItemActive {
+	background-color: var(--primary-50);
+	color: var(--primary-700);
+	font-weight: var(--font-weight-medium);
+}
+
+.dropdownItemActive svg {
+	color: var(--primary-500);
+}
+
+.dropdownEmpty {
+	padding: var(--space-6) var(--space-4);
+	text-align: center;
+	font-size: var(--text-sm);
+	color: var(--color-text-quaternary);
+	font-style: italic;
+}
+
+/* ---------------------------------------------------------------------------
+   Input Group (number + unit suffix)
+   --------------------------------------------------------------------------- */
+
+.inputGroup {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+}
+
+.inputGroup input {
+	padding-right: 3rem;
+	border-radius: var(--radius-md);
+}
+
+.inputUnit {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75rem;
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-medium);
+	font-family: var(--font-mono);
+	color: var(--color-text-quaternary);
+	pointer-events: none;
+	user-select: none;
+	border-left: var(--border-width) solid var(--color-border-subtle);
+	background: var(--color-bg-subtle);
+	border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Error State
+   --------------------------------------------------------------------------- */
+
+.inputError,
+.stateTrigger.inputError {
+	border-color: var(--error-400) !important;
+}
+
+.inputError:focus,
+.stateTrigger.inputError:focus {
+	box-shadow: var(--shadow-ring-error) !important;
+	border-color: var(--error-400) !important;
+}
+
+.errorText {
+	font-size: var(--text-xs);
+	color: var(--error-600);
+	margin-top: var(--space-1-5);
+	font-weight: var(--font-weight-medium);
+	letter-spacing: var(--tracking-wide);
+	display: flex;
+	align-items: center;
+	gap: var(--space-1);
+}
+
+/* ---------------------------------------------------------------------------
+   Range Hints
+   --------------------------------------------------------------------------- */
+
+.rangeHints {
+	display: flex;
+	align-items: center;
+	gap: var(--space-4);
+	flex-wrap: wrap;
+}
+
+.rangeHint {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+	font-size: var(--text-xs);
+	color: var(--color-text-quaternary);
+	font-family: var(--font-mono);
+	letter-spacing: var(--tracking-wide);
+	user-select: none;
+}
+
+.rangeHint svg {
+	color: var(--color-text-quaternary);
+	opacity: 0.7;
+}
+
+/* ---------------------------------------------------------------------------
+   Submit Button
+   --------------------------------------------------------------------------- */
+
+.submitBtn {
+	width: 100%;
+	justify-content: center;
+	font-weight: var(--font-weight-semibold);
+	letter-spacing: var(--tracking-wide);
+	padding-top: var(--space-3);
+	padding-bottom: var(--space-3);
+	font-size: var(--text-base);
+	border-radius: var(--radius-lg);
+	box-shadow:
+		0 1px 3px rgba(3, 152, 85, 0.2),
+		0 0 0 1px rgba(3, 152, 85, 0.08);
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		box-shadow var(--duration-fast) var(--ease-out),
+		transform var(--duration-fast) var(--ease-spring);
+}
+
+.submitBtn:hover:not(:disabled) {
+	box-shadow:
+		0 4px 12px rgba(3, 152, 85, 0.25),
+		0 0 0 1px rgba(3, 152, 85, 0.12);
+	transform: translateY(-1px);
+}
+
+.submitBtn:active:not(:disabled) {
+	transform: translateY(0) scale(0.98);
+	box-shadow:
+		0 1px 2px rgba(3, 152, 85, 0.2),
+		0 0 0 1px rgba(3, 152, 85, 0.08);
+}

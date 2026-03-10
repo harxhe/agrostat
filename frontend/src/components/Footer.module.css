@@ -1,0 +1,221 @@
+/* ==========================================================================
+   Footer — CSS Module
+   Minimal border-top footer with tech badges, brand, and link styling
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Container
+   --------------------------------------------------------------------------- */
+
+.footer {
+	margin-top: auto;
+	border-top: var(--border-width) solid var(--color-border);
+	background: rgba(255, 255, 255, 0.6);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	max-width: var(--content-max-width);
+	margin: 0 auto;
+	padding: var(--space-4) var(--space-6);
+	gap: var(--space-6);
+}
+
+/* ---------------------------------------------------------------------------
+   Left — Brand & Copyright
+   --------------------------------------------------------------------------- */
+
+.left {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	flex-shrink: 0;
+}
+
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1-5);
+	color: var(--primary-600);
+	user-select: none;
+}
+
+.brandName {
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--color-text);
+	letter-spacing: var(--tracking-tight);
+}
+
+.copyright {
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-normal);
+	color: var(--color-text-quaternary);
+	letter-spacing: var(--tracking-wide);
+	white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Center — Tech Stack Badges
+   --------------------------------------------------------------------------- */
+
+.techStack {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.techBadge {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+	padding: var(--space-0-5) var(--space-2);
+	font-size: 10px;
+	font-weight: var(--font-weight-medium);
+	font-family: var(--font-mono);
+	color: var(--color-text-tertiary);
+	background: var(--color-bg-muted);
+	border-radius: var(--radius-sm);
+	letter-spacing: var(--tracking-wide);
+	user-select: none;
+	white-space: nowrap;
+	transition:
+		color var(--duration-fast) var(--ease-out),
+		background-color var(--duration-fast) var(--ease-out);
+}
+
+.techBadge:hover {
+	color: var(--color-text-secondary);
+	background-color: var(--gray-200);
+}
+
+.techBadge svg {
+	color: var(--color-text-quaternary);
+	flex-shrink: 0;
+}
+
+.techDot {
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background-color: var(--gray-300);
+	flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Right — Links
+   --------------------------------------------------------------------------- */
+
+.right {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	flex-shrink: 0;
+}
+
+.link {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1-5);
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--color-text-tertiary);
+	text-decoration: none;
+	padding: var(--space-1) var(--space-2);
+	border-radius: var(--radius-sm);
+	letter-spacing: var(--tracking-wide);
+	white-space: nowrap;
+	transition:
+		color var(--duration-fast) var(--ease-out),
+		background-color var(--duration-fast) var(--ease-out);
+}
+
+.link:hover {
+	color: var(--color-text);
+	background-color: var(--color-bg-muted);
+}
+
+.link svg {
+	flex-shrink: 0;
+	opacity: 0.7;
+	transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.link:hover svg {
+	opacity: 1;
+}
+
+.link svg:last-child {
+	opacity: 0.4;
+	margin-left: -2px;
+}
+
+.link:hover svg:last-child {
+	opacity: 0.65;
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Tablet
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+	.techStack {
+		display: none;
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Mobile
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+	.inner {
+		padding: var(--space-3) var(--space-4);
+		gap: var(--space-3);
+	}
+
+	.copyright {
+		display: none;
+	}
+
+	.right {
+		gap: var(--space-1-5);
+	}
+
+	.link {
+		padding: var(--space-1) var(--space-1-5);
+	}
+
+	.link span {
+		display: none;
+	}
+
+	.link svg:last-child {
+		display: none;
+	}
+
+	.link svg:first-child {
+		opacity: 0.6;
+	}
+}
+
+@media (max-width: 480px) {
+	.inner {
+		justify-content: center;
+	}
+
+	.brandName {
+		font-size: var(--text-xs);
+	}
+
+	.brand svg {
+		width: 11px;
+		height: 11px;
+	}
+}

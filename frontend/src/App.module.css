@@ -1,0 +1,295 @@
+/* ==========================================================================
+   App — CSS Module
+   Two-column dashboard layout with sidebar, content area, map section,
+   error banner, and responsive breakpoints.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Main Container
+   --------------------------------------------------------------------------- */
+
+.main {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--space-6);
+	padding-top: var(--space-6);
+	padding-bottom: var(--space-8);
+}
+
+.container {
+	display: grid;
+	grid-template-columns: 380px 1fr;
+	gap: var(--space-6);
+	width: 100%;
+	max-width: var(--content-max-width);
+	align-items: start;
+}
+
+/* ---------------------------------------------------------------------------
+   Sidebar (Prediction Form)
+   --------------------------------------------------------------------------- */
+
+.sidebar {
+	position: sticky;
+	top: calc(var(--header-height) + var(--space-6));
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-5);
+	min-width: 0;
+}
+
+.sidebarCard {
+	padding: var(--space-6);
+	border-radius: var(--radius-xl);
+	box-shadow: var(--shadow-sm);
+	transition:
+		box-shadow var(--duration-base) var(--ease-out),
+		border-color var(--duration-base) var(--ease-out);
+}
+
+.sidebarCard:hover {
+	box-shadow: var(--shadow-md);
+}
+
+/* ---------------------------------------------------------------------------
+   Content Area (Map + Results / Welcome)
+   --------------------------------------------------------------------------- */
+
+.content {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-6);
+	min-width: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Map Section
+   --------------------------------------------------------------------------- */
+
+.mapSection {
+	width: 100%;
+	min-height: 420px;
+}
+
+/* ---------------------------------------------------------------------------
+   Error Banner
+   --------------------------------------------------------------------------- */
+
+.errorBanner {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--space-3);
+	padding: var(--space-3) var(--space-4);
+	background: var(--error-50);
+	border: var(--border-width) solid var(--error-200);
+	border-radius: var(--radius-lg);
+	animation: errorSlideIn var(--duration-base) var(--ease-out) both;
+}
+
+@keyframes errorSlideIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.errorIcon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--radius-md);
+	background: var(--error-100);
+	color: var(--error-600);
+	flex-shrink: 0;
+}
+
+.errorContent {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	flex: 1;
+	min-width: 0;
+}
+
+.errorTitle {
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-semibold);
+	color: var(--error-700);
+	line-height: var(--leading-tight);
+}
+
+.errorMessage {
+	font-size: var(--text-sm);
+	color: var(--error-600);
+	line-height: var(--leading-normal);
+	word-break: break-word;
+}
+
+.errorDismiss {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--radius-sm);
+	background: transparent;
+	color: var(--error-400);
+	border: none;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition:
+		background-color var(--duration-fast) var(--ease-out),
+		color var(--duration-fast) var(--ease-out);
+}
+
+.errorDismiss:hover {
+	background-color: var(--error-100);
+	color: var(--error-600);
+}
+
+/* ---------------------------------------------------------------------------
+   Results Section
+   --------------------------------------------------------------------------- */
+
+.resultsSection {
+	width: 100%;
+}
+
+.resultsCard {
+	padding: var(--space-6);
+	border-radius: var(--radius-xl);
+	box-shadow: var(--shadow-sm);
+	transition:
+		box-shadow var(--duration-base) var(--ease-out),
+		border-color var(--duration-base) var(--ease-out);
+}
+
+.resultsCard:hover {
+	box-shadow: var(--shadow-md);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Large Tablet / Small Desktop (1024px)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 1280px) {
+	.container {
+		grid-template-columns: 340px 1fr;
+		gap: var(--space-5);
+	}
+}
+
+@media (max-width: 1024px) {
+	.main {
+		padding: var(--space-4);
+		padding-bottom: var(--space-6);
+	}
+
+	.container {
+		grid-template-columns: 320px 1fr;
+		gap: var(--space-4);
+	}
+
+	.sidebarCard {
+		padding: var(--space-5);
+	}
+
+	.resultsCard {
+		padding: var(--space-5);
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Tablet (768px)
+   Stack to single column
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+	.main {
+		padding: var(--space-3);
+		padding-bottom: var(--space-6);
+	}
+
+	.container {
+		grid-template-columns: 1fr;
+		gap: var(--space-4);
+	}
+
+	.sidebar {
+		position: static;
+	}
+
+	.sidebarCard {
+		padding: var(--space-4);
+		border-radius: var(--radius-lg);
+	}
+
+	.resultsCard {
+		padding: var(--space-4);
+		border-radius: var(--radius-lg);
+	}
+
+	.mapSection {
+		min-height: 320px;
+	}
+
+	.errorBanner {
+		padding: var(--space-2-5) var(--space-3);
+		border-radius: var(--radius-md);
+	}
+
+	.errorIcon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.errorTitle {
+		font-size: var(--text-xs);
+	}
+
+	.errorMessage {
+		font-size: var(--text-xs);
+	}
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive — Small Mobile (480px)
+   --------------------------------------------------------------------------- */
+
+@media (max-width: 480px) {
+	.main {
+		padding: var(--space-2);
+		padding-bottom: var(--space-4);
+	}
+
+	.container {
+		gap: var(--space-3);
+	}
+
+	.sidebarCard {
+		padding: var(--space-3);
+		border-radius: var(--radius-md);
+	}
+
+	.resultsCard {
+		padding: var(--space-3);
+		border-radius: var(--radius-md);
+	}
+
+	.mapSection {
+		min-height: 260px;
+	}
+
+	.errorBanner {
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-2-5);
+	}
+}
