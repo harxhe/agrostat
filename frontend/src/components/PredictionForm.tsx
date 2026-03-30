@@ -237,15 +237,20 @@ export default function PredictionForm({
 					onClick={handleUseLocation}
 					disabled={locationLoading || statesLoading}
 				>
-					{locationLoading ? (
-						<Loader2 size={14} className="animate-spin" />
-					) : (
-						<Crosshair size={14} strokeWidth={2} />
-					)}
-					<span>
-						{locationLoading
-							? "Detecting..."
-							: "Use My Location"}
+					<span className={styles.locationBtnIcon}>
+						{locationLoading ? (
+							<Loader2 size={15} className="animate-spin" />
+						) : (
+							<Crosshair size={15} strokeWidth={2} />
+						)}
+					</span>
+					<span className={styles.locationBtnContent}>
+						<span className={styles.locationBtnTitle}>
+							{locationLoading ? "Detecting location..." : "Use My Location"}
+						</span>
+						<span className={styles.locationBtnHint}>
+							Auto-fill state, temperature, and humidity
+						</span>
 					</span>
 				</button>
 				{locationError && (
