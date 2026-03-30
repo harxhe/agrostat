@@ -1,7 +1,9 @@
 import {
 	Award,
 	BarChart3,
+	Check,
 	ChevronRight,
+	Cpu,
 	Droplets,
 	FlaskConical,
 	Leaf,
@@ -9,6 +11,7 @@ import {
 	Sprout,
 	Thermometer,
 	TrendingUp,
+	X,
 } from "lucide-react";
 import type { CropPredictionResponse } from "@/types/api";
 import {
@@ -177,6 +180,82 @@ export default function ResultsPanel({ result, onReset }: ResultsPanelProps) {
 				</div>
 			</div>
 
+			{/* ---- Model Comparison ---- */}
+			<div className={styles.block}>
+				<div className={styles.blockHeader}>
+					<Cpu size={14} strokeWidth={2} />
+					<h4 className={styles.blockTitle}>Model Comparison</h4>
+				</div>
+
+				<div className={styles.modelGrid}>
+					{result.model_comparison.map((m, index) => {
+						const isAgreed = m.predicted_crop === result.crop;
+						const meta = CROP_META[m.predicted_crop] ?? {
+							label: m.predicted_crop.charAt(0).toUpperCase() + m.predicted_crop.slice(1),
+							color: "#667085",
+						};
+						const confPct = (m.confidence * 100).toFixed(1);
+						const accPct = (m.accuracy * 100).toFixed(1);
+
+						return (
+							<div
+								key={m.model}
+								className={`${styles.modelCard} ${index === 0 ? styles.modelCardPrimary : ""}`}
+								style={{
+									animationDelay: `${index * 60}ms`,
+								}}
+							>
+								<div className={styles.modelCardHeader}>
+									<span className={styles.modelName}>{m.model}</span>
+									{index === 0 && (
+										<span className={styles.modelPrimaryBadge}>Primary</span>
+									)}
+								</div>
+
+								<div className={styles.modelCropRow}>
+									<div
+										className={styles.modelCropDot}
+										style={{ backgroundColor: meta.color }}
+									/>
+									<span className={styles.modelCropName}>{meta.label}</span>
+									{isAgreed ? (
+										<span className={styles.modelAgree}>
+											<Check size={10} strokeWidth={3} />
+										</span>
+									) : (
+										<span className={styles.modelDisagree}>
+											<X size={10} strokeWidth={3} />
+										</span>
+									)}
+								</div>
+
+								<div className={styles.modelStats}>
+									<div className={styles.modelStat}>
+										<span className={styles.modelStatLabel}>Confidence</span>
+										<span className={styles.modelStatValue}>{confPct}%</span>
+									</div>
+									<div className={styles.modelStat}>
+										<span className={styles.modelStatLabel}>Accuracy</span>
+										<span className={styles.modelStatValue}>{accPct}%</span>
+									</div>
+								</div>
+
+								<div className={styles.modelBarTrack}>
+									<div
+										className={styles.modelBarFill}
+										style={{
+											width: `${m.accuracy * 100}%`,
+											backgroundColor: index === 0 ? "var(--accent-500)" : "var(--gray-300)",
+											animationDelay: `${index * 80 + 100}ms`,
+										}}
+									/>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+
 			{/* ---- Nutrient Profile ---- */}
 			<div className={styles.block}>
 				<div className={styles.blockHeader}>
@@ -245,7 +324,7 @@ export default function ResultsPanel({ result, onReset }: ResultsPanelProps) {
 
 				<div className={styles.modelTag}>
 					<Leaf size={11} strokeWidth={2} />
-					<span>XGBoost v1.0</span>
+					<span>4 Models Compared</span>
 				</div>
 			</div>
 		</div>

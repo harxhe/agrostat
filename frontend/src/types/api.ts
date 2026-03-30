@@ -23,6 +23,13 @@ export interface CropProbability {
 	probability: number;
 }
 
+export interface ModelPrediction {
+	model: string;
+	predicted_crop: string;
+	confidence: number;
+	accuracy: number;
+}
+
 export interface CropPredictionResponse {
 	crop: string;
 	state: string;
@@ -30,6 +37,7 @@ export interface CropPredictionResponse {
 	humidity: number;
 	nutrient_profile: NutrientProfile;
 	top_5: CropProbability[];
+	model_comparison: ModelPrediction[];
 }
 
 export interface StatesResponse {

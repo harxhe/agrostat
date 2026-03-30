@@ -55,6 +55,19 @@ class CropProbability(BaseModel):
     )
 
 
+class ModelPrediction(BaseModel):
+    """Prediction result from a single ML model."""
+
+    model: str = Field(..., description="Model name (e.g. XGBoost, Random Forest)")
+    predicted_crop: str = Field(..., description="Crop predicted by this model")
+    confidence: float = Field(
+        ..., description="Prediction confidence (0–1)", ge=0.0, le=1.0
+    )
+    accuracy: float = Field(
+        ..., description="Model test-set accuracy (0–1)", ge=0.0, le=1.0
+    )
+
+
 class CropPredictionResponse(BaseModel):
     """Response body returned by the crop prediction endpoint."""
 
@@ -67,6 +80,9 @@ class CropPredictionResponse(BaseModel):
     )
     top_5: list[CropProbability] = Field(
         ..., description="Top 5 crops ranked by prediction probability"
+    )
+    model_comparison: list[ModelPrediction] = Field(
+        ..., description="Predictions from all ML models for comparison"
     )
 
 
