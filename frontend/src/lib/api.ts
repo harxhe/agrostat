@@ -2,8 +2,9 @@
 // AgroStat API Client
 //
 // Typed fetch helpers for every backend endpoint.
-// All paths are relative so the Vite dev-server proxy handles them
-// transparently (see vite.config.ts).
+// In production, set VITE_API_BASE_URL to your backend origin
+// (e.g. https://agrostat.onrender.com).
+// For local development, paths stay relative so Vite proxy can handle them.
 // ---------------------------------------------------------------------------
 
 import type {
@@ -14,7 +15,8 @@ import type {
 	StatesResponse,
 } from "@/types/api";
 
-const API_BASE = "/api/v1";
+const backendOrigin = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "");
+const API_BASE = backendOrigin ? `${backendOrigin}/api/v1` : "/api/v1";
 
 // ---------------------------------------------------------------------------
 // Generic helpers
