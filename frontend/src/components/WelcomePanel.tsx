@@ -19,9 +19,9 @@ const GlobeVisualization = lazy(() => import("./GlobeVisualization"));
 const FEATURES = [
 	{
 		icon: Brain,
-		title: "XGBoost Model",
+		title: "Multi-Model Ensemble",
 		description:
-			"Gradient-boosted decision tree classifier trained on 2,200 agricultural samples",
+			"Compare predictions across XGBoost, Random Forest, SVM, and KNN classifiers",
 		badge: "ML",
 	},
 	{
@@ -40,9 +40,9 @@ const FEATURES = [
 	},
 	{
 		icon: TrendingUp,
-		title: "Probability Ranking",
+		title: "Model Comparison",
 		description:
-			"Top 5 crop recommendations ranked by prediction confidence scores",
+			"Side-by-side accuracy and confidence metrics across 4 different AI models",
 		badge: "Analytics",
 	},
 ];
@@ -50,8 +50,8 @@ const FEATURES = [
 const STATS = [
 	{ value: "34", label: "States & UTs", icon: MapPin },
 	{ value: "22", label: "Crop Types", icon: Sprout },
+	{ value: "4", label: "AI Models", icon: Brain },
 	{ value: "2,200", label: "Training Samples", icon: Database },
-	{ value: "95%+", label: "Accuracy", icon: BarChart3 },
 ];
 
 export default function WelcomePanel() {

@@ -107,7 +107,13 @@ async def root():
         "version": APP_VERSION,
         "docs": "/docs",
         "health": "/api/v1/health",
+        "ping": "/ping",
     }
+
+
+@app.get("/ping", tags=["Monitoring"], summary="Uptime ping")
+async def ping():
+    return {"status": "ok", "message": "pong"}
 
 
 # ---------------------------------------------------------------------------

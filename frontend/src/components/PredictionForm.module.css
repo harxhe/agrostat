@@ -53,6 +53,112 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Location Detection CTA
+   --------------------------------------------------------------------------- */
+
+.locationRow {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.locationBtn {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	width: 100%;
+	padding: var(--space-2-5) var(--space-3);
+	border-radius: var(--radius-lg);
+	border: var(--border-width) solid var(--color-border-brand);
+	background:
+		linear-gradient(180deg, var(--primary-25) 0%, var(--color-surface) 100%);
+	color: var(--color-text);
+	cursor: pointer;
+	transition:
+		border-color var(--duration-fast) var(--ease-out),
+		box-shadow var(--duration-fast) var(--ease-out),
+		transform var(--duration-fast) var(--ease-out),
+		background-color var(--duration-fast) var(--ease-out);
+}
+
+.locationBtn:hover:not(:disabled) {
+	border-color: var(--primary-400);
+	box-shadow:
+		0 4px 12px rgba(3, 152, 85, 0.12),
+		0 0 0 1px rgba(3, 152, 85, 0.12);
+	transform: translateY(-1px);
+}
+
+.locationBtn:focus,
+.locationBtn:focus-visible {
+	outline: none;
+	border-color: var(--primary-300);
+	box-shadow: var(--shadow-ring);
+}
+
+.locationBtn:active:not(:disabled) {
+	transform: translateY(0);
+	box-shadow:
+		0 1px 4px rgba(3, 152, 85, 0.15),
+		0 0 0 1px rgba(3, 152, 85, 0.12);
+}
+
+.locationBtn:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+	background: var(--color-bg-subtle);
+	border-color: var(--color-border);
+	transform: none;
+	box-shadow: none;
+}
+
+.locationBtnIcon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.9rem;
+	height: 1.9rem;
+	border-radius: var(--radius-md);
+	background: var(--primary-50);
+	border: var(--border-width) solid var(--primary-100);
+	color: var(--primary-700);
+	flex-shrink: 0;
+}
+
+.locationBtnContent {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1px;
+	min-width: 0;
+}
+
+.locationBtnTitle {
+	font-size: var(--text-sm);
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--leading-tight);
+	color: var(--color-text);
+	letter-spacing: var(--tracking-wide);
+}
+
+.locationBtnHint {
+	font-size: var(--text-xs);
+	line-height: var(--leading-normal);
+	color: var(--color-text-tertiary);
+	font-family: var(--font-sans);
+}
+
+.locationError {
+	font-size: var(--text-xs);
+	font-weight: var(--font-weight-medium);
+	color: var(--error-600);
+	letter-spacing: var(--tracking-wide);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-1);
+}
+
+/* ---------------------------------------------------------------------------
    Fields
    --------------------------------------------------------------------------- */
 

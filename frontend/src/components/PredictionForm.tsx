@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
 	ChevronDown,
+	Crosshair,
 	Droplets,
 	Loader2,
 	MapPin,
@@ -9,6 +10,7 @@ import {
 	Zap,
 } from "lucide-react";
 import { fetchStates } from "@/lib/api";
+import { STATE_COORDINATES } from "@/lib/constants";
 import styles from "./PredictionForm.module.css";
 
 interface PredictionFormProps {
@@ -29,6 +31,9 @@ export default function PredictionForm({
 
 	const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
 	const [stateSearch, setStateSearch] = useState("");
+
+	const [locationLoading, setLocationLoading] = useState(false);
+	const [locationError, setLocationError] = useState<string | null>(null);
 
 	const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -119,6 +124,94 @@ export default function PredictionForm({
 		}
 	};
 
+	const findNearestState = useCallback(
+		(lat: number, lng: number): string | null => {
+			let nearest: string | null = null;
+			let minDist = Infinity;
+			for (const s of STATE_COORDINATES) {
+				const d = (s.lat - lat) ** 2 + (s.lng - lng) ** 2;
+				if (d < minDist) {
+					minDist = d;
+					nearest = s.name;
+				}
+			}
+			// Only match if within a reasonable distance (~5 degrees)
+			return minDist < 25 ? nearest : null;
+		},
+		[],
+	);
+
+	const handleUseLocation = useCallback(async () => {
+		if (!navigator.geolocation) {
+			setLocationError("Geolocation is not supported by your browser");
+			return;
+		}
+
+		setLocationLoading(true);
+		setLocationError(null);
+
+		try {
+			const position = await new Promise<GeolocationPosition>(
+				(resolve, reject) => {
+					navigator.geolocation.getCurrentPosition(resolve, reject, {
+						enableHighAccuracy: false,
+						timeout: 10000,
+						maximumAge: 300000, // cache for 5 minutes
+					});
+				},
+			);
+
+			const { latitude, longitude } = position.coords;
+
+			// Fetch current weather from Open-Meteo (free, no API key)
+			const res = await fetch(
+				`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m`,
+			);
+
+			if (!res.ok) throw new Error("Failed to fetch weather data");
+
+			const weather = await res.json();
+			const temp = weather.current?.temperature_2m;
+			const hum = weather.current?.relative_humidity_2m;
+
+			if (temp != null) setTemperature(String(temp));
+			if (hum != null) setHumidity(String(hum));
+
+			// Match nearest state
+			const nearest = findNearestState(latitude, longitude);
+			if (nearest && states.includes(nearest)) {
+				setSelectedState(nearest);
+			}
+
+			// Clear any existing errors for the filled fields
+			setErrors((prev) => {
+				const copy = { ...prev };
+				if (temp != null) delete copy.temperature;
+				if (hum != null) delete copy.humidity;
+				if (nearest && states.includes(nearest)) delete copy.state;
+				return copy;
+			});
+		} catch (err) {
+			if (err instanceof GeolocationPositionError) {
+				switch (err.code) {
+					case err.PERMISSION_DENIED:
+						setLocationError("Location permission denied");
+						break;
+					case err.POSITION_UNAVAILABLE:
+						setLocationError("Location unavailable");
+						break;
+					case err.TIMEOUT:
+						setLocationError("Location request timed out");
+						break;
+				}
+			} else {
+				setLocationError("Could not fetch weather for your location");
+			}
+		} finally {
+			setLocationLoading(false);
+		}
+	}, [findNearestState, states]);
+
 	return (
 		<form className={styles.form} onSubmit={handleSubmit} noValidate>
 			{/* Section Header */}
@@ -135,6 +228,35 @@ export default function PredictionForm({
 			</div>
 
 			<hr className="divider" />
+
+			{/* Auto-detect Location */}
+			<div className={styles.locationRow}>
+				<button
+					type="button"
+					className={styles.locationBtn}
+					onClick={handleUseLocation}
+					disabled={locationLoading || statesLoading}
+				>
+					<span className={styles.locationBtnIcon}>
+						{locationLoading ? (
+							<Loader2 size={15} className="animate-spin" />
+						) : (
+							<Crosshair size={15} strokeWidth={2} />
+						)}
+					</span>
+					<span className={styles.locationBtnContent}>
+						<span className={styles.locationBtnTitle}>
+							{locationLoading ? "Detecting location..." : "Use My Location"}
+						</span>
+						<span className={styles.locationBtnHint}>
+							Auto-fill state, temperature, and humidity
+						</span>
+					</span>
+				</button>
+				{locationError && (
+					<span className={styles.locationError}>{locationError}</span>
+				)}
+			</div>
 
 			{/* State Selector */}
 			<div className={styles.field}>

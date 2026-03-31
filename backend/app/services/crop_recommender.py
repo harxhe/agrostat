@@ -9,10 +9,14 @@ import logging
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.svm import SVC
 from xgboost import XGBClassifier
 
 from backend.app.core.config import (
@@ -65,11 +69,15 @@ def _get_dominant_nutrient_level(row: pd.Series, nutrient_type: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+MODEL_NAMES = ["XGBoost", "Random Forest", "SVM", "KNN"]
+
+
 class CropRecommenderService:
     """Singleton-style service – instantiate once at app startup."""
 
     def __init__(self) -> None:
-        self.model: XGBClassifier | None = None
+        self.models: dict[str, object] = {}
+        self.model_accuracies: dict[str, float] = {}
         self.scaler: StandardScaler | None = None
         self.le_crop: LabelEncoder | None = None
         self.le_nutrient: LabelEncoder | None = None
@@ -123,8 +131,9 @@ class CropRecommenderService:
 
     def train(self) -> dict:
         """
-        Train the XGBoost model on ``Crop_recommendation.csv``, persist
-        artifacts to disk, and return training metrics.
+        Train all models (XGBoost, Random Forest, SVM, KNN) on
+        ``Crop_recommendation.csv``, persist artifacts to disk, and
+        return training metrics.
         """
         logger.info("Reading datasets …")
         df = pd.read_csv(CROP_RECOMMENDATION_CSV)
@@ -170,21 +179,43 @@ class CropRecommenderService:
         X_train_scaled = self.scaler.fit_transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
 
-        self.model = XGBClassifier(
-            random_state=42, use_label_encoder=False, eval_metric="mlogloss"
-        )
-        self.model.fit(X_train_scaled, y_train)
+        # Define all models
+        model_definitions = {
+            "XGBoost": XGBClassifier(
+                random_state=42, use_label_encoder=False, eval_metric="mlogloss"
+            ),
+            "Random Forest": RandomForestClassifier(
+                n_estimators=100, random_state=42
+            ),
+            "SVM": SVC(kernel="rbf", probability=True, random_state=42),
+            "KNN": KNeighborsClassifier(n_neighbors=5),
+        }
 
-        y_pred = self.model.predict(X_test_scaled)
-        accuracy = float(accuracy_score(y_test, y_pred))
-        report = classification_report(y_test, y_pred, output_dict=True)
+        self.models = {}
+        self.model_accuracies = {}
+        reports: dict[str, dict] = {}
 
-        logger.info("Training complete – accuracy %.4f", accuracy)
+        for name, model in model_definitions.items():
+            logger.info("Training %s …", name)
+            model.fit(X_train_scaled, y_train)
+            y_pred = model.predict(X_test_scaled)
+            acc = float(accuracy_score(y_test, y_pred))
+            self.models[name] = model
+            self.model_accuracies[name] = round(acc, 6)
+            reports[name] = classification_report(y_test, y_pred, output_dict=True)
+            logger.info("%s accuracy: %.4f", name, acc)
 
         # Persist to disk
         self._save_artifact(MODEL_ARTIFACT_PATH)
 
-        return {"accuracy": accuracy, "classification_report": report}
+        return {
+            "accuracy": self.model_accuracies["XGBoost"],
+            "classification_report": reports["XGBoost"],
+            "all_models": {
+                name: {"accuracy": self.model_accuracies[name], "classification_report": reports[name]}
+                for name in MODEL_NAMES
+            },
+        }
 
     # ------------------------------------------------------------------
     # Prediction
@@ -192,11 +223,12 @@ class CropRecommenderService:
 
     def predict(self, state: str, temperature: float, humidity: float) -> dict:
         """
-        Predict the best crop(s) for the given inputs.
+        Predict the best crop(s) for the given inputs using all models.
 
         Returns a dict with:
-          - ``crop``: the single best predicted crop
-          - ``probabilities``: sorted list of ``{crop, probability}`` dicts
+          - ``crop``: the single best predicted crop (from XGBoost)
+          - ``top_5``: sorted list of ``{crop, probability}`` dicts (from XGBoost)
+          - ``model_comparison``: predictions from all models with confidence & accuracy
         """
         if not self._is_ready:
             raise RuntimeError("Service is not initialised. Call .initialise() first.")
@@ -230,11 +262,13 @@ class CropRecommenderService:
 
         input_scaled = self.scaler.transform(input_df)
 
-        predicted_label = int(self.model.predict(input_scaled)[0])
+        # Primary prediction from XGBoost
+        xgb_model = self.models["XGBoost"]
+        predicted_label = int(xgb_model.predict(input_scaled)[0])
         predicted_crop = self.le_crop.inverse_transform([predicted_label])[0]
 
-        # Class probabilities
-        proba = self.model.predict_proba(input_scaled)[0]
+        # XGBoost class probabilities for top-5
+        proba = xgb_model.predict_proba(input_scaled)[0]
         crop_probabilities = [
             {
                 "crop": self.le_crop.inverse_transform([i])[0],
@@ -244,6 +278,21 @@ class CropRecommenderService:
         ]
         crop_probabilities.sort(key=lambda x: x["probability"], reverse=True)
 
+        # Predictions from all models
+        model_comparison = []
+        for name in MODEL_NAMES:
+            model = self.models[name]
+            pred_label = int(model.predict(input_scaled)[0])
+            pred_crop = self.le_crop.inverse_transform([pred_label])[0]
+            model_proba = model.predict_proba(input_scaled)[0]
+            confidence = round(float(np.max(model_proba)), 6)
+            model_comparison.append({
+                "model": name,
+                "predicted_crop": pred_crop,
+                "confidence": confidence,
+                "accuracy": self.model_accuracies.get(name, 0.0),
+            })
+
         return {
             "crop": predicted_crop,
             "state": state,
@@ -251,6 +300,7 @@ class CropRecommenderService:
             "humidity": humidity,
             "nutrient_profile": {"N": n_cat, "P": p_cat, "K": k_cat},
             "top_5": crop_probabilities[:5],
+            "model_comparison": model_comparison,
         }
 
     # ------------------------------------------------------------------
@@ -281,7 +331,8 @@ class CropRecommenderService:
     def _save_artifact(self, path: Path) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         components = {
-            "model": self.model,
+            "models": self.models,
+            "model_accuracies": self.model_accuracies,
             "scaler": self.scaler,
             "le_crop": self.le_crop,
             "le_nutrient": self.le_nutrient,
@@ -291,11 +342,21 @@ class CropRecommenderService:
 
     def _load_artifact(self, path: Path) -> None:
         components = joblib.load(path)
-        self.model = components["model"]
+        # Support loading old single-model artifacts
+        if "model" in components and "models" not in components:
+            self.models = {"XGBoost": components["model"]}
+            self.model_accuracies = {"XGBoost": 0.0}
+        else:
+            self.models = components["models"]
+            self.model_accuracies = components.get("model_accuracies", {})
         self.scaler = components["scaler"]
         self.le_crop = components["le_crop"]
         self.le_nutrient = components["le_nutrient"]
         self._available_crops = sorted(self.le_crop.classes_.tolist())
+        # If we only have a single model from an old artifact, retrain all
+        if len(self.models) < len(MODEL_NAMES):
+            logger.info("Old artifact detected – retraining to include all models")
+            self.train()
         logger.info("Model artifacts loaded successfully")
 
 

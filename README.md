@@ -75,6 +75,8 @@ agrostat/
 - **Python 3.10+**
 - **pip** (or your preferred package manager)
 
+For Render deployment, use **Python 3.11.x** (or 3.12.x). Python 3.14 may fail because some ML dependencies may not provide prebuilt wheels yet.
+
 ---
 
 ## Installation
